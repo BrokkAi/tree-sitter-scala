@@ -23,7 +23,6 @@ assert wasm.is_file(), "Expected the pinned CLI's exported grammar WASM"
 module = wasm.read_bytes()
 assert module[:4] == b"\0asm", "Export must contain a WASM module"
 revision = hashlib.sha256(module).hexdigest()
-wasm.rename(page.with_name("tree-sitter-scala.wasm"))
 loader = page.with_name("playground.js")
 javascript = loader.read_text()
 grammar_url = "${LANGUAGE_BASE_URL}/tree-sitter-${newLanguageName}.wasm"
