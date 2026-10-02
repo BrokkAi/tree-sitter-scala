@@ -14,4 +14,7 @@ html, count = re.subn(
     flags=re.DOTALL,
 )
 assert count == 1, "Exported playground must have one title"
+base_url = 'LANGUAGE_BASE_URL = "";'
+assert html.count(base_url) == 1, "Expected the pinned CLI's language base URL"
+html = html.replace(base_url, 'LANGUAGE_BASE_URL = ".";')
 page.write_text(html)
