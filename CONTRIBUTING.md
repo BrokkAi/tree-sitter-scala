@@ -36,7 +36,7 @@ There is no scheduled workflow that silently regenerates this fork.
 
 ## Playground
 
-With Emscripten installed or Docker available:
+The pinned CLI downloads its WebAssembly compiler toolchain as needed:
 
 ```sh
 npx tree-sitter build --wasm
