@@ -2385,7 +2385,7 @@ module.exports = grammar({
         seq(
           field("value", $._simple_expression),
           ".",
-          field("field", $._identifier),
+          field("field", choice($._identifier, alias("export", $.identifier))),
         ),
       ),
 

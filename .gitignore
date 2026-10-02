@@ -46,3 +46,6 @@ dist/
 
 # AI assistants
 .aider*
+
+# Exported local playground
+site/

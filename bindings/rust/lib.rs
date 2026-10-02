@@ -14,7 +14,7 @@
 //! }
 //! "#;
 //! let mut parser = Parser::new();
-//! let language = tree_sitter_scala::LANGUAGE;
+//! let language = brokk_tree_sitter_scala::LANGUAGE;
 //! parser
 //!     .set_language(&language.into())
 //!     .expect("Error loading Scala parser");
@@ -55,5 +55,74 @@ mod tests {
         parser
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading Scala parser");
+    }
+
+    #[test]
+    fn export_selector_preserves_the_call_and_following_member() {
+        let source = "class Runner { def run() = Export.export(project, file); def next() = 1 }";
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&super::LANGUAGE.into()).unwrap();
+        let tree = parser.parse(source, None).unwrap();
+        assert!(
+            !tree.root_node().has_error(),
+            "{}",
+            tree.root_node().to_sexp()
+        );
+
+        let mut stack = vec![tree.root_node()];
+        let mut selectors = Vec::new();
+        let mut functions = Vec::new();
+        while let Some(node) = stack.pop() {
+            if node.kind() == "call_expression" {
+                let function = node.child_by_field_name("function").unwrap();
+                assert_eq!(function.kind(), "field_expression");
+                let selector = function.child_by_field_name("field").unwrap();
+                assert_eq!(selector.kind(), "identifier");
+                selectors.push(selector.utf8_text(source.as_bytes()).unwrap());
+            }
+            if node.kind() == "function_definition" {
+                functions.push(
+                    node.child_by_field_name("name")
+                        .unwrap()
+                        .utf8_text(source.as_bytes())
+                        .unwrap(),
+                );
+            }
+            let mut cursor = node.walk();
+            stack.extend(node.named_children(&mut cursor));
+        }
+        selectors.sort_unstable();
+        functions.sort_unstable();
+        assert_eq!(selectors, ["export"]);
+        assert_eq!(functions, ["next", "run"]);
+    }
+
+    #[test]
+    fn scala_three_export_keeps_its_declaration_node() {
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&super::LANGUAGE.into()).unwrap();
+        let tree = parser.parse("export service.run", None).unwrap();
+        assert!(
+            !tree.root_node().has_error(),
+            "{}",
+            tree.root_node().to_sexp()
+        );
+        assert_eq!(
+            tree.root_node().named_child(0).unwrap().kind(),
+            "export_declaration"
+        );
+    }
+
+    #[test]
+    fn bundled_queries_compile() {
+        let language = super::LANGUAGE.into();
+        for query in [
+            super::HIGHLIGHTS_QUERY,
+            super::LOCALS_QUERY,
+            include_str!("../../queries/indents.scm"),
+            include_str!("../../queries/tags.scm"),
+        ] {
+            tree_sitter::Query::new(&language, query).unwrap();
+        }
     }
 }

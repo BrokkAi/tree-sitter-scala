@@ -1,32 +1,55 @@
-# tree-sitter-scala
+# Brokk's Scala Grammar for Tree-sitter
 
-[![CI][ci]](https://github.com/tree-sitter/tree-sitter-scala/actions/workflows/ci.yml)
-[![discord][discord]](https://discord.gg/w7nTvsVJhm)
-[![matrix][matrix]](https://matrix.to/#/#tree-sitter-chat:matrix.org)
-[![crates][crates]](https://crates.io/crates/tree-sitter-scala)
-[![npm][npm]](https://www.npmjs.com/package/tree-sitter-scala)
+[![CI](https://img.shields.io/github/actions/workflow/status/BrokkAi/tree-sitter-scala/ci.yml?branch=master&logo=github&label=CI)](https://github.com/BrokkAi/tree-sitter-scala/actions/workflows/ci.yml)
+[![Playground](https://img.shields.io/github/actions/workflow/status/BrokkAi/tree-sitter-scala/pages.yml?branch=master&logo=github&label=Playground)](https://brokkai.github.io/tree-sitter-scala/)
 
-Scala grammar for [tree-sitter](https://github.com/tree-sitter/tree-sitter)
-covering both Scala 2 and 3.
+This is the **Brokk-owned and independently maintained fork** of
+[`tree-sitter/tree-sitter-scala`](https://github.com/tree-sitter/tree-sitter-scala),
+a [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar for Scala 2
+and Scala 3. Brokk maintains it for its code-intelligence tooling.
 
-## References
+Try the grammar in [Brokk's web playground](https://brokkai.github.io/tree-sitter-scala/).
 
-_Scala 2_
+The `master` branch carries the grammar previously vendored by Bifrost,
+including the Scala 2 `Export.export(project, file)` selector correction.
+Upstream history, the MIT license, bindings, queries and corpus tests are
+preserved. See [BROKK_PATCH.md](BROKK_PATCH.md) for exact provenance.
 
-- [The Scala 2 Language Specification](https://www.scala-lang.org/files/archive/spec/2.13/)
-- [Scala 2 Syntax Summary](https://www.scala-lang.org/files/archive/spec/2.13/13-syntax-summary.html)
+## Rust package
 
-_Scala 3_
+The package is `brokk-tree-sitter-scala` 0.26.3. The initial repository setup
+has not published a registry package or switched Bifrost's dependency. Use an
+exact reviewed commit for a Git dependency:
 
-- [Scala 3 Syntax Summary](https://docs.scala-lang.org/scala3/reference/syntax.html)
+```toml
+tree-sitter-scala = { package = "brokk-tree-sitter-scala", git = "https://github.com/BrokkAi/tree-sitter-scala", rev = "<reviewed-commit>" }
+```
 
-## Development and Contributing
+Rust builds use the checked-in parser and need no Node or Tree-sitter CLI.
+The native entry point remains `tree_sitter_scala`; use one Scala grammar per
+binary. Other bindings retain their upstream identities. The npm manifest is
+private, and there is no automatic package publication workflow.
 
-Please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on
-getting set up.
+## Development
 
-[ci]: https://img.shields.io/github/actions/workflow/status/tree-sitter/tree-sitter-scala/ci.yml?logo=github&label=CI
-[discord]: https://img.shields.io/discord/1063097320771698699?logo=discord&label=discord
-[matrix]: https://img.shields.io/matrix/tree-sitter-chat%3Amatrix.org?logo=matrix&label=matrix
-[npm]: https://img.shields.io/npm/v/tree-sitter-scala?logo=npm
-[crates]: https://img.shields.io/crates/v/tree-sitter-scala?logo=rust
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and regeneration instructions.
+
+```sh
+cargo test --locked
+cargo clippy --locked --all-targets -- -D warnings
+cargo fmt --check
+npm ci --ignore-scripts
+npm rebuild tree-sitter-cli
+npx tree-sitter test --rebuild
+```
+
+The CI checks the grammar corpus, highlighting and tag assertions, Rust
+bindings and parser regressions, formatting, linting and standalone packaging
+on Linux, Windows and macOS. The Pages workflow builds the checked-in parser
+as WebAssembly and deploys its playground.
+
+## Language references
+
+- [Scala 2 language specification](https://www.scala-lang.org/files/archive/spec/2.13/)
+- [Scala 2 syntax summary](https://www.scala-lang.org/files/archive/spec/2.13/13-syntax-summary.html)
+- [Scala 3 syntax summary](https://docs.scala-lang.org/scala3/reference/syntax.html)
