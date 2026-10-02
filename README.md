@@ -17,12 +17,12 @@ preserved. See [BROKK_PATCH.md](BROKK_PATCH.md) for exact provenance.
 
 ## Rust package
 
-The package is `brokk-tree-sitter-scala` 0.26.3. The initial repository setup
-has not published a registry package or switched Bifrost's dependency. Use an
-exact reviewed commit for a Git dependency:
+The released Rust package is
+[`brokk-tree-sitter-scala` 0.26.3](https://crates.io/crates/brokk-tree-sitter-scala/0.26.3).
+Bifrost uses this registry package, including the contextual selector correction:
 
 ```toml
-tree-sitter-scala = { package = "brokk-tree-sitter-scala", git = "https://github.com/BrokkAi/tree-sitter-scala", rev = "<reviewed-commit>" }
+brokk-tree-sitter-scala = "=0.26.3"
 ```
 
 Rust builds use the checked-in parser and need no Node or Tree-sitter CLI.
